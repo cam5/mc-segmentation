@@ -25,4 +25,28 @@ function mc_segmentation() {
     new MC_Segmentation_Editor();
 }
 
+
+add_shortcode('mc_segmentation', 'mc_segmentation_check' );
+
+function mc_segmentation_check() {
+    include( plugin_dir_path( __FILE__ ) . '/api/MCAPI.class.php' );
+    include( plugin_dir_path( __FILE__ ) . '/api/MCAPI_Legacy.class.php' );
+
+    $api = new MCAPI(get_option('mc_segmentation')['apikey']);
+
+    $merge_vars = Array( 
+        'EMAIL' => 'me@cameronhurd.com',
+        'FNAME' => 'Firsty', 
+        'LNAME' => 'LastName'
+    );
+
+    $list_id = "37d5137c62";
+
+    if( $api->listSubscribe($list_id, $merge_vars['EMAIL'], $merge_vars , 'html') )
+        return 'Success!&nbsp; Check your inbox or spam folder for a message containing a confirmation link.';
+    else
+        return '<b>Error:</b>&nbsp; ' . $api->errorMessage;
+
+}
+
 ?>
