@@ -29,10 +29,9 @@ function mc_segmentation() {
 add_shortcode('mc_segmentation', 'mc_segmentation_check' );
 
 function mc_segmentation_check() {
-    include( plugin_dir_path( __FILE__ ) . '/api/MCAPI.class.php' );
-    include( plugin_dir_path( __FILE__ ) . '/api/MCAPI_Legacy.class.php' );
+    include( plugin_dir_path( __FILE__ ) . '/MailChimpApi.php' );
 
-    $api = new MCAPI(get_option('mc_segmentation')['apikey']);
+    $api = new \Drewm\MailChimp(get_option('mc_segmentation')['apikey']);
 
     $merge_vars = Array( 
         'EMAIL' => 'me@cameronhurd.com',
@@ -42,7 +41,18 @@ function mc_segmentation_check() {
 
     $list_id = "37d5137c62";
 
-    if( $api->listSubscribe($list_id, $merge_vars['EMAIL'], $merge_vars , 'html') )
+    $result = $api->call('lists/subscribe', array(
+        'id'                => $list_id,
+        'email'             => array( 'email' => $merge_vars['EMAIL'] ),
+        'merge_vars'        => array( $merge_vars ),
+        'double_optin'      => true,
+        'update_existing'   => true,
+        'replace_interests' => false,
+        'send_welcome'      => true
+        ) 
+    );
+
+    if( $result )
         return 'Success!&nbsp; Check your inbox or spam folder for a message containing a confirmation link.';
     else
         return '<b>Error:</b>&nbsp; ' . $api->errorMessage;
