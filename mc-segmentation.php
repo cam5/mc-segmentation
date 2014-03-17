@@ -8,8 +8,9 @@
 	Author URI: http://cameronhurd.com/
 */
 
-add_action( 'admin_menu', 'register_mc_segmentation_menu_page' );
+include(plugin_dir_path( __FILE__ ) . '/custom-metadata/custom_metadata.php');
 
+add_action( 'admin_menu', 'register_mc_segmentation_menu_page' );
 function register_mc_segmentation_menu_page(){
     add_management_page(
         'Mailchimp Segmentation Settings', 
@@ -57,6 +58,23 @@ function mc_segmentation_check() {
     else
         return '<b>Error:</b>&nbsp; ' . $api->errorMessage;
 
+}
+
+add_action( 'admin_init', 'mc_woocommerce_custom_fields' );
+function mc_woocommerce_custom_fields() {
+    if( is_plugin_active('woocommerce/woocommerce.php') && function_exists( 'x_add_metadata_group' ) && function_exists( 'x_add_metadata_field' ) ) {
+
+        x_add_metadata_group( 'mcList', 'product', array(
+            'label' => 'Mailchimp Options'
+        ) );
+
+        x_add_metadata_field('x_fieldName1', 'product', array(
+            'group' => 'mcList',
+            'field_type' => 'checkbox',
+            'label' => 'Record Purchase of this product?',
+            'display_column' => true
+        ));
+    }
 }
 
 ?>
