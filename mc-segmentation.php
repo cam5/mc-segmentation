@@ -110,15 +110,34 @@ function woo_mc_segmentation_complete_order( $order_id = 0 )
         $api = new \Drewm\MailChimp(get_option('mc_segmentation')['apikey']);
 
         $merge_vars = array(
-            'EMAIL' => 'mc_purchas_test_11dg@cameronhurd.com',
+            'EMAIL' => $order->billing_email,
             'FNAME' => $order->billing_first_name,
             'LNAME' => $order->billing_last_name
         );
 
+        $list_id = "37d5137c62";
+
+        $member_info = $api->call('lists/member-info', array(
+            'id' => $list_id,
+            'emails' => array( array('email' => $order->billing_email) )
+            )
+        );
+
+        $already_purchased = '';
+
+        if ( !$member_info['error_count'] )
+            $already_purchased = $member_info['data'][0]['merges']['PURCHASED'];
+
+        // is a single sku or a comma separated list of skus
+        $sku_formatting_error = !preg_match('/^(([0-9A-z:]\b)|([0-9A-z:]*)(,\s)?)*$/', $already_purchased);
+
+        if ('' != $already_purchased && !$sku_formatting_error)
+            foreach (explode(', ', $already_purchased) as $item)
+                if (!in_array($item, $items_to_record))
+                    $items_to_record[] = $item;
+
         if (sizeof($items_to_record)>0)
             $merge_vars['PURCHASED'] = implode(', ', $items_to_record);
-
-        $list_id = "37d5137c62";
         
         $result = $api->call('lists/subscribe', array(
             'id'                => $list_id,
@@ -127,9 +146,11 @@ function woo_mc_segmentation_complete_order( $order_id = 0 )
             'double_optin'      => true,
             'update_existing'   => true,
             'replace_interests' => false,
-            'send_welcome'      => true
+            'send_welcome'      => false
             ) 
         );
+
+        
         
     }
 }
