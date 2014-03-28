@@ -18,7 +18,8 @@ class MC_Segmentation_Editor {
 		$data = get_option('mc_segmentation');
 
 		$defaults = array(
-			'apikey' => 'ThisIsNotARealBCode'
+			'apikey' => 'ThisIsNotARealAPIKey',
+			'listId' => 'ThisIsNotARealListID'
 		);
 
 		$this->current_options = wp_parse_args($data, $defaults);
@@ -68,7 +69,14 @@ class MC_Segmentation_Editor {
 						<th scope="row">
 							<label for="mc_segmentation[apikey]">Api Key</label></th>
 						<td>
-							<input name="mc_segmentation[apikey]" id="espeakers_bcode" value="<? echo $this->current_options['apikey'] ?>" />
+							<input name="mc_segmentation[apikey]" id="api_key" value="<? echo $this->current_options['apikey'] ?>" />
+						</td>
+					</tr>
+					<tr valign="top">
+						<th scope="row">
+							<label for="mc_segmentation[listId]">List Id</label></th>
+						<td>
+							<input name="mc_segmentation[listId]" id="list_id" value="<? echo $this->current_options['listId'] ?>" />
 						</td>
 					</tr>
 				</table>

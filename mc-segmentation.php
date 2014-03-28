@@ -115,7 +115,7 @@ function woo_mc_segmentation_complete_order( $order_id = 0 )
             'LNAME' => $order->billing_last_name
         );
 
-        $list_id = "37d5137c62";
+        $list_id = get_option('mc_segmentation')['listId'];
 
         $member_info = $api->call('lists/member-info', array(
             'id' => $list_id,
